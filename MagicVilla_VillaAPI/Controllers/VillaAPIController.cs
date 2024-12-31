@@ -1,6 +1,8 @@
 ﻿using MagicVilla_VillaAPI.Data;
+using MagicVilla_VillaAPI.Logging;
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.Dto;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MagicVilla_VillaAPI.Controllers
@@ -9,9 +11,18 @@ namespace MagicVilla_VillaAPI.Controllers
     [ApiController]
     public class VillaAPIController : ControllerBase
     {
+
+        //private readonly ILogger<VillaAPIController> _logger;
+        private readonly ILogging _logger;
+        public VillaAPIController(ILogging logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<VillaDTO>> GetVillas() {
+            _logger.Log("Get all villas", "");
             return Ok(VillaStore.villaList);
         }
 
@@ -26,6 +37,7 @@ namespace MagicVilla_VillaAPI.Controllers
         public ActionResult<VillaDTO> GetVilla(int id) {
 
             if (id == 0) {
+                _logger.Log("Get villa error with Id" + id, "error");
                 return BadRequest();
             }
 
@@ -91,6 +103,44 @@ namespace MagicVilla_VillaAPI.Controllers
                 return NotFound();
             }
             VillaStore.villaList.Remove(villa);
+            return NoContent();
+        }
+
+        [HttpPut("id:int", Name = "UpdateVilla")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult UpdateVilla(int id, [FromBody] VillaDTO villaDTO) {
+            if (villaDTO == null || id != villaDTO.Id) { 
+                return BadRequest();
+            }
+
+            var villa = VillaStore.villaList.FirstOrDefault(u=>  u.Id == id);
+            villa.Name = villaDTO.Name;
+            villa.Occupancy = villaDTO.Occupancy;
+            villa.Sqft = villaDTO.Sqft;
+
+            return NoContent();
+        }
+
+        [HttpPatch("id:int", Name = "UpdatePartialVilla")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult UpdatePartialVilla(int id, JsonPatchDocument<VillaDTO> patchDTO) { 
+            if(id == 0 || patchDTO == null)
+            {
+                return BadRequest();
+            }
+            var villa = VillaStore.villaList.FirstOrDefault(u => u.Id == id);
+            if (villa == null)
+            {
+                return BadRequest();
+            }
+            patchDTO.ApplyTo(villa, ModelState);
+            
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             return NoContent();
         }
 
