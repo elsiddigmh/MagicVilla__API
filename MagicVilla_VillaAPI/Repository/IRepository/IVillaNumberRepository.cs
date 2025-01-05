@@ -3,8 +3,8 @@ using System.Linq.Expressions;
 
 namespace MagicVilla_VillaAPI.Repository.IRepository
 {
-    public interface IVillaNumberRepository : IRepository<VillaNumber>
+    public interface IVillaRepository : IRepository<Villa>
     {
-        Task<VillaNumber> UpdateAsync(VillaNumber entity);
+        Task<Villa> UpdateAsync(Villa entity);
     }
 }
