@@ -2,6 +2,7 @@
 using MagicVilla_VillaAPI.Models;
 using MagicVilla_VillaAPI.Models.Dto;
 using MagicVilla_VillaAPI.Repository.IRepository;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -12,12 +13,14 @@ namespace MagicVilla_VillaAPI.Controllers
     public class VillaNumberController : Controller
     {
         private readonly IVillaNumberRepository _dbVillaNumber;
+        private readonly IVillaRepository _dbVilla;
         protected readonly IMapper _mapper;
         private readonly APIResponse _response;
 
-        public VillaNumberController(IVillaNumberRepository dbVillaNumber, IMapper mapper)
+        public VillaNumberController(IVillaNumberRepository dbVillaNumber, IVillaRepository dbVilla , IMapper mapper)
         {
             _dbVillaNumber = dbVillaNumber;
+            _dbVilla = dbVilla;
             _mapper = mapper;
             _response = new();
         }
@@ -98,6 +101,12 @@ namespace MagicVilla_VillaAPI.Controllers
 
                 }
 
+                if(await _dbVilla.GetAsync(u=>u.Id == createDTO.VillaID) == null)
+                {
+                    ModelState.AddModelError("CustomError", "Villa ID is invalid");
+                    return BadRequest(ModelState);
+                }
+
                 if (createDTO == null)
                 {
                     return NotFound(createDTO);
@@ -164,6 +173,13 @@ namespace MagicVilla_VillaAPI.Controllers
                 {
                     return BadRequest();
                 }
+
+                if (await _dbVilla.GetAsync(u => u.Id == updateDTO.VillaID) == null)
+                {
+                    ModelState.AddModelError("CustomError", "Villa ID is invalid");
+                    return BadRequest(ModelState);
+                }
+
 
                 VillaNumber model = _mapper.Map<VillaNumber>(updateDTO);
 
