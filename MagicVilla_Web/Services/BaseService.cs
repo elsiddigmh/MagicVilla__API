@@ -13,7 +13,7 @@ namespace MagicVilla_Web.Services
 
         public BaseService(IHttpClientFactory httpClientFactory)
         {
-            this.httpClientFactory = httpClientFactory;
+            this.httpClient = httpClientFactory;
             this.responseModel = new();
         }
 
