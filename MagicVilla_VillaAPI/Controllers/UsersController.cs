@@ -45,6 +45,7 @@ namespace MagicVilla_VillaAPI.Controllers
                 _response.ErrorMessages.Add("Username already exists");
                 return BadRequest(_response);
             }
+
             var user = await _userRepo.Register(model);
             if (user == null) {
                 _response.StatusCode = HttpStatusCode.BadRequest;

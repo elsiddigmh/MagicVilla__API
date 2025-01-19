@@ -8,5 +8,7 @@
             PUT,
             DELETE,
         }
+
+        public static string SessionToken = "JwtToken";
     }
 }
