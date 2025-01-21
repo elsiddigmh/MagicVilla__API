@@ -37,7 +37,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<APIResponse>> GetVillas([FromQuery(Name = "filterOccupancy")] int? occupancy, 
-                                                               [FromQuery] string? search,int pageSize = 2, int pageNumber = 1)
+                                                               [FromQuery] string? search,int pageSize = 0, int pageNumber = 1)
         {
             try
             {
@@ -85,6 +85,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 if (id == 0)
                 {
                     _response.StatusCode = HttpStatusCode.BadRequest;
+                    _response.IsSuccess = false;
                     return BadRequest(_response);
                 }
 
@@ -93,6 +94,7 @@ namespace MagicVilla_VillaAPI.Controllers.v1
                 if (villa == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
+                    _response.IsSuccess = false;
                     return NotFound(_response);
                 }
 
